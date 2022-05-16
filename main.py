@@ -5,6 +5,7 @@ import numpy as np
 from cvzone.HandTrackingModule import HandDetector  # 手部检测方法
 import cvzone
 import pyautogui
+import autopy
 
 previousMouseX = 0
 previousMouseY = 0  # 上一帧时的鼠标所在位置
@@ -55,9 +56,9 @@ def detectMouse(img):
     # （7）平滑，使手指在移动鼠标时，鼠标箭头不会一直晃动
     currentMouseX = previousMouseX + (windowsX - previousMouseX) / smooth  # 当前的鼠标所在位置坐标
     currentMouseY = previousMouseY + (windowsY - previousMouseY) / smooth
-
     # （8）移动鼠标
-    pyautogui.moveTo(currentMouseX, currentMouseY)
+    autopy.mouse.move(currentMouseX/2, currentMouseY/2)
+    # pyautogui.moveTo(currentMouseX, currentMouseY)
 
     # 更新前一帧的鼠标所在位置坐标，将当前帧鼠标所在位置，变成下一帧的鼠标前一帧所在位置
     previousMouseX, previousMouseY = currentMouseX, currentMouseY
@@ -130,8 +131,8 @@ if __name__ == '__main__':
     fpsReader = cvzone.FPS()
     # （1）导数视频数据
     screenW, screenH = pyautogui.size()  # 返回电脑屏幕的宽和高(2160,1440)
-    cameraW, cameraH = (screenW, screenH)  # 视频显示窗口的宽和高
-    pt1, pt2 = (100, 100), (1100, 500)  # 虚拟鼠标的移动范围，左上坐标pt1，右下坐标pt2
+    cameraW, cameraH = (1280, 720)  # 视频显示窗口的宽和高
+    pt1, pt2 = (100, 100), (1180, 620)  # 虚拟鼠标的移动范围，左上坐标pt1，右下坐标pt2
 
     cap = cv2.VideoCapture(0)  # 0代表自己电脑的摄像头
     cap.set(3, cameraW)  # 设置显示框的宽度1280
