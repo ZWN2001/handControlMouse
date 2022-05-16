@@ -18,6 +18,8 @@ canDo = 0  # 实现三种点击的互斥
 clickThreshold = 1.15
 doubleClickThreshold = 1.6
 rightClickThreshold = 1.8
+isMouseDown = False
+
 
 def detectMouse(img):
     global previousMouseY
@@ -29,6 +31,7 @@ def detectMouse(img):
     global clickThreshold
     global doubleClickThreshold
     global rightClickThreshold
+    global isMouseDown
 
     lmList = hands[0]['lmList']  # hands是由N个字典组成的列表，字典包每只手的关键点信息
 
@@ -43,7 +46,7 @@ def detectMouse(img):
 
     baseX1, baseY1, c = lmList[0]
     baseX2, baseY2, c1 = lmList[5]
-    baseDistance = getDist_P2P((baseX1, baseY1), (baseX2, baseY2)) #手掌根部到食指根部的距离
+    baseDistance = getDist_P2P((baseX1, baseY1), (baseX2, baseY2))  # 手掌根部到食指根部的距离
 
     # （5）检查哪个手指是朝上的
     fingers = detector.fingersUp(hands[0])
@@ -57,7 +60,7 @@ def detectMouse(img):
     currentMouseX = previousMouseX + (windowsX - previousMouseX) / smooth  # 当前的鼠标所在位置坐标
     currentMouseY = previousMouseY + (windowsY - previousMouseY) / smooth
     # （8）移动鼠标
-    autopy.mouse.move(currentMouseX/2, currentMouseY/2)
+    autopy.mouse.move(currentMouseX / 2, currentMouseY / 2)
     # pyautogui.moveTo(currentMouseX, currentMouseY)
 
     # 更新前一帧的鼠标所在位置坐标，将当前帧鼠标所在位置，变成下一帧的鼠标前一帧所在位置
@@ -66,7 +69,7 @@ def detectMouse(img):
     if fingers[1] == 1:  # 食指竖起
         # distance, info, img = detector.findDistance((x1, y1), (x2, y2), img)
         distance = getDist_P2P((x1, y1), (x2, y2))
-        if distance/baseDistance > clickThreshold:
+        if distance / baseDistance > clickThreshold:
             if canReClick and canDo == 0:
                 pyautogui.click()
                 canReClick = False
@@ -80,7 +83,7 @@ def detectMouse(img):
     if fingers[2] == 1:
         # distance, info, img = detector.findDistance((x1, y1), (x3, y3), img)
         distance = getDist_P2P((x1, y1), (x3, y3))
-        if distance/baseDistance > doubleClickThreshold:
+        if distance / baseDistance > doubleClickThreshold:
             if canReDoubleClick and canDo == 0:
                 pyautogui.doubleClick()
                 canReDoubleClick = False
@@ -94,7 +97,7 @@ def detectMouse(img):
     if fingers[4] == 1:
         # distance, info, img = detector.findDistance((x1, y1), (x5, y5), img)
         distance = getDist_P2P((x1, y1), (x5, y5))
-        if distance/baseDistance > rightClickThreshold:
+        if distance / baseDistance > rightClickThreshold:
             if canRightClick and canDo == 0:
                 pyautogui.rightClick()
                 canRightClick = False
@@ -105,10 +108,10 @@ def detectMouse(img):
             canRightClick = True
             canDo = 0
 
-    if fingers == [0, 0, 1, 0, 0]:  # 竖中指
+    if fingers == [0, 0, 1, 1, 1]:  # 比3动作
         detectScroll(isVertical=True, isUp=True)
 
-    if fingers == [0, 0, 0, 1, 0]:  # 竖无名指
+    if fingers == [0, 0, 0, 0, 1]:  # 竖小拇指
         detectScroll(isVertical=True, isUp=False)
 
 
