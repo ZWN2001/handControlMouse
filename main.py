@@ -170,7 +170,11 @@ class Detector:
         cap.release()
         cv2.destroyAllWindows()
 
+    def stopDetect(self):
+        self.detecting = False
+
 
 if __name__ == '__main__':
     de = Detector()
     de.startDetect()
+    de.stopDetect()
