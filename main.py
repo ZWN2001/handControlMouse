@@ -24,9 +24,14 @@ clickThreshold = 1.15
 doubleClickThreshold = 1.6
 rightClickThreshold = 1.8
 isMouseDown = False
+smooth = 5  # 自定义平滑系数，让鼠标移动平缓一些
+screenW = 10
+screenH = 10
+hands = 0
+detector = 0
 
 
-def detectMouse(image):
+def detectMouse(image, pt1, pt2):
     global previousMouseY
     global previousMouseX
     global canDo
@@ -122,7 +127,12 @@ def getDist_P2P(Point0, PointA):
     return distance
 
 
-if __name__ == '__main__':
+def detect():
+    global screenH
+    global screenW
+    global hands
+    global detector
+
     fpsReader = cvzone.FPS()
     # （1）导数视频数据
     screenW, screenH = pyautogui.size()  # 返回电脑屏幕的宽和高(2160,1440)
@@ -132,8 +142,6 @@ if __name__ == '__main__':
     cap = cv2.VideoCapture(0)  # 0代表自己电脑的摄像头
     cap.set(3, cameraW)  # 设置显示框的宽度1280
     cap.set(4, cameraH)  # 设置显示框的高度720
-
-    smooth = 5  # 自定义平滑系数，让鼠标移动平缓一些
 
     # （2）接收手部检测方法
     detector = HandDetector(mode=False,  # 视频流图像
@@ -158,7 +166,7 @@ if __name__ == '__main__':
 
         # 如果能检测到手那么就进行下一步
         if hands:
-            detectMouse(image=img)
+            detectMouse(image=img, pt1=pt1, pt2=pt2)
 
         # （10）显示图像
         # 查看FPS
@@ -171,3 +179,7 @@ if __name__ == '__main__':
     # 释放视频资源
     cap.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    detect()
