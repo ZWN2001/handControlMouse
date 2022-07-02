@@ -1,4 +1,5 @@
 import math
+from multiprocessing import Process
 
 import cv2
 import cvzone
@@ -6,6 +7,7 @@ import numpy as np
 from cvzone.HandTrackingModule import HandDetector  # 手部检测方法
 import pyautogui
 import autopy
+import psutil
 
 
 def getDist_P2P(Point0, PointA):
@@ -35,9 +37,12 @@ class Detector:
     __smooth = 5  # 自定义平滑系数，让鼠标移动平缓一些
     __screenW = 10
     __screenH = 10
-    __hands = 0
-    __detector = 0
+    __hands = None
+    __detector = None
     __detecting = False
+
+    def __init__(self):
+        self.p = Process(target=self.__detect())
 
     def __detectMouse(self, image, pt1, pt2):
 
@@ -119,7 +124,7 @@ class Detector:
             else:
                 pyautogui.vscroll(-self.__verticalMove)
 
-    def startDetect(self):
+    def __detect(self):
         fpsReader = cvzone.FPS()
         # （1）导数视频数据
         self.__screenW, self.__screenH = pyautogui.size()  # 返回电脑屏幕的宽和高(2160,1440)
@@ -168,10 +173,22 @@ class Detector:
         cap.release()
         cv2.destroyAllWindows()
 
-    def stopDetect(self):
-        self.__detecting = False
+    def startDetect(self):
+        self.p.start()
+
+    def pause(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.suspend()
+
+    def reStart(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.resume()
+
+    def exit(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.kill()
 
 
-if __name__ == '__main__':
-    de = Detector()
-    de.startDetect()
+# if __name__ == '__main__':
+#     de = Detector()
+#     de.startDetect()
