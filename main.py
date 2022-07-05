@@ -39,10 +39,28 @@ class Detector:
     __screenH = 10
     __hands = None
     __detector = None
-    __detecting = False
+    p = None
 
     def __init__(self):
         self.p = Process(target=self.__detect())
+
+    def __detect(self):
+        self.__dealWithHandImage()
+
+    def startDetect(self):
+        self.p.start()
+
+    def pause(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.suspend()
+
+    def reStart(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.resume()
+
+    def exit(self):
+        ps = psutil.Process(pid=self.p.pid)
+        ps.kill()
 
     def __detectMouse(self, image, pt1, pt2):
 
@@ -124,7 +142,7 @@ class Detector:
             else:
                 pyautogui.vscroll(-self.__verticalMove)
 
-    def __detect(self):
+    def __dealWithHandImage(self):
         fpsReader = cvzone.FPS()
         # （1）导数视频数据
         self.__screenW, self.__screenH = pyautogui.size()  # 返回电脑屏幕的宽和高(2160,1440)
@@ -142,8 +160,7 @@ class Detector:
                                        minTrackCon=0.5)  # 最小跟踪置信度
 
         # （3）处理每一帧图像
-        self.__detecting = True
-        while self.__detecting:
+        while True:
             # 图片是否成功接收、img帧图像
             success, img = cap.read()
 
@@ -172,23 +189,3 @@ class Detector:
         # 释放视频资源
         cap.release()
         cv2.destroyAllWindows()
-
-    def startDetect(self):
-        self.p.start()
-
-    def pause(self):
-        ps = psutil.Process(pid=self.p.pid)
-        ps.suspend()
-
-    def reStart(self):
-        ps = psutil.Process(pid=self.p.pid)
-        ps.resume()
-
-    def exit(self):
-        ps = psutil.Process(pid=self.p.pid)
-        ps.kill()
-
-
-# if __name__ == '__main__':
-#     de = Detector()
-#     de.startDetect()
